@@ -1,0 +1,400 @@
+---
+title: "ME111 - Trabalho Final"
+author: "Helton M. Ávila (174471), Leticia Duarte (178797)"
+date: "27/06/2016"
+output: pdf_document
+---
+
+**ESPECIFICAÇÃO DO EXPERIMENTO**
+
+O presente relatório acadêmico pretende abordar, em seis questões, conteúdos transmitidos durante o semestre na matéria ME111 – Laboratório de Estatística, de forma a promover uma aprendizagem holística e analisar o conhecimento adquirido pelo aluno sobre a mesma. Para a realização das análises descritivas , testes de hipóteses e estudar a distribuição constituída a partir de um banco de dados composto por variáveis respondidas pelos alunos desta matéria por meio desse experimento observacional, o método aplicado foi a utilização do software estatístico R e análise dos resultados obtidos.
+
+
+```{r, echo = FALSE}
+dados <- read.csv("QuestionarioProjetoFinal.csv")
+attach(dados)
+```
+
+```{r, echo = FALSE}
+set.seed(123456)
+```
+
+```{r, echo = FALSE}
+##Sorteio das meninas
+meninas <- subset(dados, Sexo == "Feminino")
+
+Fsort <- sample(seq(1:28), 20, replace = FALSE)
+Fdados <- meninas[Fsort,]
+
+##Sorteio dos meninos
+meninos <- subset(dados, Sexo == "Masculino")
+
+Msort <- sample(seq(1:48), 30, replace = FALSE)
+Mdados <- meninos[Msort,]
+```
+
+```{r, echo = FALSE}
+##Agrupamento de ambos os grupos
+dados2 <- rbind(Fdados, Mdados)
+```
+
+
+**1. Faça uma análise descritiva da variável altura separada por sexo. Calcule as estatísticas sumárias e faça um histograma e uma boxplot da altura por sexo.**
+
+
+```{r, echo = FALSE, fig.height=3}
+par(mfrow=c(1,2))
+
+hist(Mdados$Altura, col = "royalblue3", xlab = "Altura", ylab = "Frequência", main = "Alturas dos alunos", border = FALSE, ylim = c(0, 10), xlim = c(150, 190))
+hist(Fdados$Altura, col = "lightpink", xlab = "Altura", ylab = "Frequência", main = "Alturas das alunas", border = FALSE,  ylim = c(0, 10), xlim = c(150, 190))
+```
+
+```{r, echo = FALSE, fig.height=3}
+boxplot(Mdados$Altura, Fdados$Altura, col = c("royalblue3", "lightpink"), main = "Boxplot da altura dos alunos", yaxt = "n", outcol = c("royalblue3", "lightpink"), pch = 16, horizontal = TRUE, xlab = "Altura (cm)")
+legend("topright", legend = c("Masculino", "Feminino"), fill = c("royalblue3","lightpink"), cex = 0.8)
+```
+
+A distribuição das alturas do sexo masculino possui uma forma assimétrica à esquerda, o que implica que a quantidade de alunos com a altura inferior à média (`r mean(Mdados$Altura)` cm) é baixa.  Como existe esse tipo de assimetria, e a média é altamente influenciável quanto aos valores mais extremos, podemos concluir que a mediana da distribuição se encontra à direita da média, ou seja, o valor da mediana é maior do que o valor da média. Essa relação se torna explícita visualmente mediante exposição do boxplot da variável, pois a cauda da esquerda é mais extensa do que a da direita.
+
+Pelo histograma das alturas do sexo feminino é possível identificar que a maior concentração de dados se encontra até o valor 170 cm, com poucos indivíduos apresentando alturas acima desse ponto. Portanto, é possível concluir que tal distribuição é assimétrica à esquerda, com média menor do que a mediana. O boxplot da variável nos auxilia a identificar essas características: a cauda da esquerda é mais extensa, justificando assimetria. 
+
+Um fator interessante de se analisar aqui é que a altura máxima na amostra de meninas se aproxima do valor da mediana das alturas dos meninos, o que fica aparente com a sobreposição dos boxplots.
+É importante ressaltar que, na amostra sorteada, não fora identificado nenhum valor caracterizado como um possível outlier. Outro fator a colaborar com essa análise é a indicação das estatísticas sumárias de cada sexo, conforme segue abaixo, com Mdados sendo o subgrupo do estudo com 30 meninos e Fdados o subgrupo contendo 20 meninas escolhidas ao acaso: 
+
+```{r, echo = FALSE}
+summary(Mdados$Altura)
+summary(Fdados$Altura)
+```
+
+**2. Faça uma análise descritiva das seguintes variáveis por sexo: Namorado, Fumante, MudariaAparencia, Voluntariado, BebidaAlcoolica, AtividadeFisica, SentaSalaAula.**
+
+```{r, fig.width = 12, fig.height = 4, echo = FALSE}
+par(mfrow=c(1,2))
+
+##Se namora por sexo
+NamoradoSexo <- table(dados2$Sexo, dados2$Namorado)
+pNamoradoSexo <- round(prop.table(NamoradoSexo, 2),4)
+
+par(mar=c(5, 4, 4, 2))
+barplot(pNamoradoSexo, beside = TRUE, col = c("lightpink", "royalblue3"), main = "Distribuição de alunos que namoram", border = FALSE)
+legend("topright", c("Feminino", "Masculino"), fill = c("lightpink", "royalblue3"), cex = 0.8, bty = "o", border = FALSE)
+
+##Fumantes por sexo
+FumanteSexo <- table(dados2$Sexo, dados2$Fumante)
+pFumanteSexo <- round(prop.table(FumanteSexo, 2),4)
+
+par(mar=c(5, 4, 4, 2))
+barplot(pFumanteSexo, beside = TRUE, col = c("lightpink", "royalblue3"), main = "Distribuição de alunos fumam", border = FALSE)
+legend("topleft", c("Feminino", "Masculino"), fill = c("lightpink", "royalblue3"), cex = 0.8, bty = "o", border = FALSE)
+
+##Se mudaria a aparência por sexo
+AparenciaSexo <- table(dados2$Sexo, dados2$Aparencia)
+pAparenciaSexo <- round(prop.table(AparenciaSexo, 2),4)
+
+par(mar=c(5, 4, 4, 2))
+barplot(pAparenciaSexo, beside = TRUE, col = c("lightpink", "royalblue3"), main = "Distribuição de alunos que mudariam a aparência", border = FALSE)
+legend("topleft", c("Feminino", "Masculino"), fill = c("lightpink", "royalblue3"), cex = 0.8, bty = "o", border = FALSE)
+
+##Pratica voluntariado por sexo
+VoluntariadoSexo <- table(dados2$Sexo, dados2$Voluntariado)
+pVoluntariadoSexo <- round(prop.table(VoluntariadoSexo, 2),4)
+
+par(mar=c(5, 4, 4, 2))
+barplot(pVoluntariadoSexo, beside = TRUE, col = c("lightpink", "royalblue3"), main = "Distribuição de alunos que praticam voluntariado", border = FALSE)
+legend("topright", c("Feminino", "Masculino"), fill = c("lightpink", "royalblue3"), cex = 0.8, bty = "o", border = FALSE)
+```
+
+**Indivíduos que namoram**
+A variável Namorado por sexo possui duas respostas possíveis: sim e não. Da amostra, aqueles que responderam que, sim, estão em um relacionamento no momento, geraram uma proporção igual para ambos os sexos. No entanto, a proporção de homens que responderam que não estão em um relacionamento foi maior do que a proporção de mulheres que o fez, portanto, a proporção de homens solteiros na sala de aula é maior do que a proporção de mulheres solteiras.
+
+**Consumo de cigarro**
+O subgrupo dos indivíduos que fumam, da variável Fumante separada por sexo, é constituído exclusivamente por homens na amostra gerada aleatoriamente. Portanto, a proporção de homens que fumam é maior do que a proporção de mulheres que o fazem. Já na variável aparência, a proporção de indivíduos do sexo masculino que mudariam a sua aparência é semelhante à proporção de homens que não o fariam, e essa tendência se repete para o sexo feminino.
+
+**Indivíduos que mudariam a aparência**
+A proporção de indivíduos do sexo masculino que mudariam a sua aparência é semelhante a proporção de homens que não o fariam, e essa tendência se repete para o sexo feminino.
+
+**Pratica de voluntariado**
+Analisando a variável “voluntariado” por sexo, podemos observar uma correlação negativa, uma vez que a proporção de meninas que praticam voluntariado é superior aos meninos, que por sua vez é maior que as meninas quanto se trata da negação de voluntariado.
+
+**Consumo de bebida alcoólica**
+A variável “bebida alcoólica” é divida em quatro categorias de diferentes frequências do consumo de álcool: 1 a 2 vezes por semana; 3 a 4 vezes por semana; mais que 4 vezes por semana e não consumo. Com a ilustração dos gráficos que representam as proporções, podemos observar uma correlação positiva entre as repostas afirmativas em “3 a 4 vezes por semana” e “não consumo”. Entretanto, ao observarmos as demais respostas, concluímos que os meninos tendem a consumir mais bebida alcoólica, uma vez que, os mesmos são os únicos que confirmam consumir de 3 a 4 semanas.
+
+
+**Frequência semanal da pratica em atividades físicas**
+O questionário aplicado aos alunos, a fim de estudar a frequência da pratica de atividades físicas entre os sexos, apresentou uma frequência maior dos meninos em ambas categorias possíveis, definida em 1 a 2 semanas; 3 a 4 semanas; mais de 4 vezes e não faço nenhuma atividade, que categorização a pratica semana. Entretanto, através da ilustração gráfica é possível observar uma homogeneidade entre os na categoria “mais de 4 vezes por semana”e uma equivalência na distinção das proporções entre as categorias “ 1 a 2 vezes por semana” e “3 a 4 vezes por semana”. 
+
+**Localização do assento na sala de aula**
+O estudo da localidade do aluno em sala de aula é dividido em três categorias: frente, centro e fundo. O questionário respondido pelos alunos de ambos os sexos, apontou uma distribuição maior dos meninos em sala, sendo os únicos a afirmarem sentar no fundo, entretanto apresentam uma frequência maior na localização da frente, em sala de aula. Por sua vez, o sexo feminino se concentra entre na região da frente e centro, tendo uma proporção mais que os meninos no centro.
+
+
+```{r, fig.width = 12, fig.height = 4, echo = FALSE}
+##Ingestão de bebida alcoólica por sexo
+BebidaAlcoolicaSexo <- table(dados2$Sexo, dados2$BebidaAlcoolica)
+pBebidaAlcoolicaSexo <- round(prop.table(BebidaAlcoolicaSexo, 2),4)
+
+par(mar=c(5, 4, 4, 2))
+barplot(pBebidaAlcoolicaSexo, beside = TRUE, col = c("lightpink", "royalblue3"), main = "Distribuição de alunos que ingerem bebida alcoólica", legend.text = FALSE, border = FALSE)
+legend("topright", c("Feminino", "Masculino"), fill = c("lightpink", "royalblue3"), cex = 0.8, bty = "o", border = FALSE)
+
+##Prática de atividade física por sexo
+AtividadeFisicaSexo <- table(dados2$Sexo, dados2$AtividadeFisica)
+pAtividadeFisicaSexo <- round(prop.table(AtividadeFisicaSexo, 2),4)
+
+par(mar=c(5, 4, 4, 2))
+barplot(pAtividadeFisicaSexo, beside = TRUE, col = c("lightpink", "royalblue3"), main = "Quantidade em dias de Atividade Fisica praticada pelos alunos", border = FALSE, las = 1, ylim = c(0, 0.75))
+legend("topright", c("Feminino", "Masculino"), fill = c("lightpink", "royalblue3"), cex = 0.8, bty = "o", border = FALSE)
+
+##Localização do assento na sala de aula por sexo
+SentaSalaAulaSexo <- table(dados2$Sexo, dados2$SentaSalaAula)
+pSentaSalaAulaSexo <- round(prop.table(SentaSalaAulaSexo, 2),4)
+
+par(mar=c(5, 4, 4, 2))
+barplot(SentaSalaAulaSexo, beside = TRUE, col = c("lightpink", "royalblue3"), main = "Localização na qual os alunos sentam na sala de aula", border = FALSE, las = 1)
+legend("topright", c("Feminino", "Masculino"), fill = c("lightpink", "royalblue3"), cex = 0.8, bty = "o", border = FALSE)
+```
+
+
+**3. Considere a variável altura e escolha apenas um dos sexos.**
+
+**a. Calcule a média e o desvio padrão das alturas da população toda, ou seja, de todos os meninos ou de todas as meninas de acordo com o sexo que você escolheu analisar.**
+
+```{r, echo = FALSE}
+AlturaF <- subset(Altura, Sexo == "Feminino")
+
+mean (AlturaF)
+sd (AlturaF)
+```
+
+Para o estudo fora necessário a disponibilidade de um banco de dados contendo 76 indivíduos, sendo estes, 28 meninas e 48 meninos, ambos contendo 36 variáveis de estudo. Fora escolhido um sexo para análise da altura, a fim de observar a precisão amostral como referência para a média da populacional de `r round(mean(AlturaF),2)`. 
+
+**b. Retire uma amostra aleatória de n = 20 (se for meninas) ou n = 30 (se for meninos) elementos da variável Altura. Com essa amostra, qual é sua melhor estimativa pontual para a média populacional?**
+
+```{r, echo = FALSE}
+Fsort2 <- sample(seq(1:28), 20, replace = FALSE)
+Fdados2 <- meninas[Fsort,]
+mean(Fdados2$Altura)
+```
+
+Por critério contingente, o sexo feminino foi o determinado como objeto de estudo e, para o mesmo, foi retirada uma amostra aleatória de 20 elementos da variável altura, obtendo assim, uma média amostral equivalente a 165.05 a ser definida como uma estimativa à população.
+
+**c) Já que você tem acesso aos dados de toda a população, simule a distribuição amostral da média amostral retirando 5000 amostras de n elementos da população e calculando 5000 médias amostrais, onde n é de acordo com o sexo que você escolheu. Crie um histograma com os resultados, e então descreva a forma dessa distribuição amostral.**
+
+```{r, echo = FALSE,  fig.height = 3.7}
+set.seed (123456)
+
+meanFeminino <- replicate(5000, mean(sample(meninas$Altura, 20)))
+
+hist(meanFeminino,  col = "lightpink", ylab = "Frequência", xlab = "Altura", main = "Histograma das Médias de Altura (Feminino)", border = FALSE)
+```
+
+Obtendo a amostra contendo 20 objetos de estudo, a mesma foi simulada 5000 vezes, ilustrando a distribuição das médias de cada ensaio em um histograma. O qual apresentou uma distribuição simétrica, com alguns pontos discrepantes tanto à direita quando à esquerda, em valores a baixo de 163 e a cima de 167, entretanto, centralizando sua média e moda em valores entre 164.5 e 165.5. O histograma pode ser visualizado no próximo item.
+
+**d. Ajuste uma curva normal ao histograma obtido em c. Você acha que a distribuição amostral da média amostral segue uma distribuição normal? Justifique.**
+
+```{r, echo = FALSE, fig.height = 3.7}
+m <- mean(meanFeminino)
+std <- sqrt(var(meanFeminino))
+
+hist(meanFeminino, las = 1, col = "lightpink", ylab = "Frequência", xlab = "Altura", main = "Histograma das Médias de Altura (Feminino)", breaks = 20, probability = TRUE, border = FALSE, ylim = c(0, 0.55))
+curve(dnorm(x, mean = m, sd = std), col = "slateblue4", lwd = 2, add = TRUE, yaxt="n")
+
+qqnorm(meanFeminino)
+qqline(meanFeminino, col = "slateblue4", lwd = 2)
+```
+
+Logo, ajustando uma curva normal ao gráfico, podemos observar que a dispersão se enquadra na curva desenhada, assim a distribuição amostral da média amostral segue uma distribuição normal. Essa conclusão é reafirmada pelo fato dos pontos estarem próximos à linha no gráfico quantil-quantil.
+
+**e.Baseado nessa distribuição amostral, qual seria seu palpite para a média das alturas do sexo que você escolheu na população? Compare com a média populacional.**
+
+```{r, echo = FALSE}
+mean(meanFeminino)
+mean(meninas$Altura)
+```
+
+Não obstante, ao calcularmos a média da simulação que resulta em 165.0774 é possível notarmos que o valor obtido converge para o valor real da população. 
+
+**f. Comente a respeito da dispersão da média amostral.**
+
+Comparando as médias da amostra aleatória e de sua simulação em 5000 ensaios, é possível retificar, mediante os valores obtidos, que o número de ensaios intervém na precisão da estimativa populacional. Uma vez que, a média amostral da simulação se aproxima da média populacional, com menor índice de erro.
+
+Com a disponibilidade de um banco de dados contendo 76 indivíduos, sendo estes, 28 meninas e 48 meninos, ambos contendo 36 variáveis de estudo. Fora escolhido um sexo para analise da altura, a fim de observar a precisão amostral como referência para a média da populacional de 165.0714.
+Por critério contingente, o sexo feminino foi o determinado como objeto de estudo e, para o mesmo, foi retirada uma amostra aleatória de 20 elementos da variável altura, obtendo assim, uma média amostral equivalente a 165.05 a ser definida como uma estimativa à população. 
+
+Obtendo a amostra contendo 20 objetos de estudo, a mesma foi simulada 5000 vezes, ilustrando a distribuição das médias de cada ensaio em um histograma. O qual apresentou uma distribuição simétrica, com alguns pontos discrepantes tanto à direita quando à esquerda, em valores a baixo de 163 e a cima de 167, entretanto, centralizando sua média e moda em valores entre 164.5 e 165.5. Logo, ajustando uma curva normal ao gráfico, podemos observar que a dispersão se enquadra na curva desenhada, assim a distribuição amostral da média amostral segue uma distribuição normal.
+
+Não obstante, ao calcularmos a média da simulação que resulta em 165.0774 é possível notarmos que o valor obtido converge para o valor real da população. Assim, retificamos que o número de ensaios intervém na precisão da estimativa populacional. 
+
+
+**4. Verifique se existe diferença na proporção de alunos dos sexo feminino e masculino para cada uma das variáveis do item 2. Utilize o teste Qui-Quadrado ou o teste Exato de Fisher quando apropriado, justificando sua escolha. Especifique o que está sendo testado e apresente suas conclusões, ou seja, defina as hipóteses nula e alternativa, a estatística de teste e sua distribuição sob H0, o p-valor e a decisão. Considere um nível de significância de a = 5%.**
+
+Para a realização do teste, temos que a hipótese nula $H0$ é a alternativa que defende a existência de igualdade entre as proporções de voluntariado por sexo, e a hipótese alternativa $H1$ como a que defende a existência de diferença entre elas. A partir dessas hipóteses, a distribuição do teste sob $H0$ se trata de uma relação bilateral, com nível de significância de alfa = 5%.
+
+O teste Qui-Quadrado é utilizado para analisar a associação entre duas variáveis qualitativas X e Y, aqui sendo *sexo* e *prática de voluntariado*. Para utilizá-lo, no entanto, deve-se garantir que as frequências esperadas em cada classe não sejam inferiores a 5 unidades sempre que o número total de observações for n <= 20. Se n >20 não deve existir mais do que 20% das células com frequências esperadas inferiores a 5, e nem deverá existir nenhuma célula com frequência esperada inferior a 1.
+
+Uma vez que a distribuição da estatística de teste é apenas aproximada, para amostras pequenas o valor do *p-value* do Qui-Quadrado pode conter um erro considerável. No caso de tabelas 2x2 e sempre que n <= 20, e dentro das restrições já apresentadas, deve-se recorrer ao Teste Exato de Fisher, pois este pode fornecer valores mais precisos para os *p-values* do teste.
+
+
+```{r, echo = FALSE}
+##NamoradoSexo
+addmargins(NamoradoSexo)
+chisq.test(NamoradoSexo, simulate.p.value = TRUE)
+pchisq(0.98039, 1, lower.tail = FALSE)
+
+##FumanteSexo
+addmargins(FumanteSexo)
+fisher.test(FumanteSexo, alternative = "two.sided")
+
+##AparenciaSexo
+addmargins(AparenciaSexo)
+chisq.test(AparenciaSexo, simulate.p.value = TRUE)
+pchisq(0.013528, 1, lower.tail = FALSE)
+
+##VoluntariadoSexo
+addmargins(VoluntariadoSexo)
+chisq.test(VoluntariadoSexo, simulate.p.value = TRUE)
+pchisq(6.3492, 1, lower.tail = FALSE)
+
+##BebidaAlcoolicaSexo
+addmargins(BebidaAlcoolicaSexo)
+fisher.test(BebidaAlcoolicaSexo, alternative = "two.sided")
+
+##AtividadeFisicaSexo
+addmargins(AtividadeFisicaSexo)
+fisher.test(AtividadeFisicaSexo, alternative = "two.sided")
+
+##SentaSalaAulaSexo
+addmargins(SentaSalaAulaSexo)
+fisher.test(SentaSalaAulaSexo, alternative = "two.sided")
+```
+
+De todas essas tabelas, apenas a de voluntariado por sexo é rejeitada pois seu teste Qui-Quadrado apontou um X² cujo valor está contido na área de rejeição.
+
+**5. Considere apenas as variáveis sexo e voluntariado. A seguir faça um teste para verificar se existe diferença entre a proporção de alunos do sexo feminino e masculino que praticam voluntariado.**
+
+```{r, echo = FALSE}
+##Tabela observada
+addmargins(VoluntariadoSexo)
+
+xsqr <- chisq.test(VoluntariadoSexo, simulate.p.value = TRUE)$statistic
+pchisq(6.349206, 1, lower.tail = FALSE)
+```
+
+```{r, echo = FALSE}
+##Criando tabelas possíveis e calculando p-valor
+
+xsqrd <- rep(0, 1000)
+for(i in 1:1000){
+sex <- rep(c("Feminino", "Masculino"), times = c(20,30))
+volunt <-rep(c("Não", "Sim"), times = c(35,15))
+
+sex_va <- sample(sex, replace = FALSE)
+volunt_va <- sample(volunt, replace = FALSE)
+
+xy <- table(sex_va, volunt_va)
+xsqrd [i] <- chisq.test(xy, simulate.p.value = TRUE)$statistic
+}
+
+##xsqrd
+pvalor <- round(sum((xsqrd >= xsqr)/1000),4)
+pvalor
+```
+
+Definida uma amostra contendo 50 objetos, sendo 30 meninos e 20 meninas, fora estudada a variável voluntariado por sexo, a fim de observar suas proporções. Assim, definindo o teste qui-quadrado como mais adequado para avaliação, observou-se duas hipóteses: hipótese nula, onde as proporções são iguais entre ambos os sexo; hipótese alternativa, onde as proporções se diferem.
+
+Para rejeição ou não da hipótese nula, houve o estudo da tabela observada, ou seja, das repostas obtidas na amostra retira e a realização de n combinações da quantidade de indivíduos e de “não” e “sim” (por sexo). Logo, foi mantida as marginais e recombinando os valores centrais, de modo a encontrar a proporção real esperada entre as respectivas, respostas.
+
+Ao calcularmos a proporção na tabela observada, obtemos um valor equivalente a 0.011, o considerando como parâmetro para calculamos a área superior a este valor, de modo a obter a proporção e, assim, compararmos com o grau de significância definido por 10% (o qual é um parâmetro para rejeição ou não da hipótese). Para maior precisão da analise estatística, recombinamos a tabela com n=1000 e com média obtida calculamos os pontos superiores ao observado.
+
+```{r, echo = FALSE}
+##Construindo histograma com limiar
+media <- mean(xsqrd)
+desvio <- sd(xsqrd)
+
+hist(xsqrd, col = "purple3", probability = TRUE, main = "Histograma de densidade do X²", ylab = "Densidade", xlab = "X²")
+##hist(xsqrd[xsqrd>6], add = TRUE, col=2)
+curve(dnorm(x, mean = media, sd = desvio), col = "forestgreen", add = TRUE, yaxt = "n", lwd = 2)
+```
+
+```{r, echo = FALSE}
+##Calculando a resposta por aproximação Qui-Quadrado
+chisq.test(VoluntariadoSexo, simulate.p.value = TRUE)$statistic
+round(pchisq(6.349206, 1, lower.tail = FALSE), 4)
+```
+
+Com o calculo da proporção, obtivemos um valor de 0.021, assim rejeitaremos a hipótese numa uma vez que Pvalor < 10%. Não obstante, concluímos que em, pelo menos, 80% das possíveis recombinações rejeitamos a hipótese nula e logo, as proporções são distintas entre os sexos.
+
+
+**6. Considere as variáveis PesoAtual e PesoDesejado.**
+
+**a. Faça um gráfico de dispersão para essas duas variáveis colocando no eixo x o peso atual e no eixo y o peso desejado. O que você esperaria desse gráfico?**
+
+```{r, echo = FALSE, fig.height = 3.5}
+plot(dados2$PesoAtual, dados2$PesoDesejado, xlab = "Peso Atual", yla = "Peso Desejado", main = "Peso atual e desejado de ambos o sexos", col = "royalblue", pch = 16)
+```
+
+Esperaria encontrar uma relação direta entre o peso atual (eixo x) e o peso desejado (eixo y). Por exemplo, pode haver um ponto em (80,70). Isso nos diria que esse ponto pertence a um indivíduo da amostra que atualmente possui 80 kg, e seu peso desejado é 70 kg. 
+
+**b. Adicione uma linha no gráfico que representa a igualdade entre peso atual e peso desejado. Qual a porcentagem de pessoas que gostaria de pesar menos do que realmente pesa?**
+
+```{r, echo = FALSE, fig.height = 3.5}
+plot(dados2$PesoAtual, dados2$PesoDesejado, xlab = "Peso Atual", yla = "Peso Desejado", main = "Peso atual e desejado de ambos o sexos", col = "royalblue", pch = 16)
+
+igualdade <- line(c(50:90), c(50:90))
+abline(coef(igualdade), col = "red", lwd = "2")
+```
+
+```{r, echo = FALSE}
+porcent <- sum(dados2$PesoAtual>dados2$PesoDesejado)/nrow(dados2)
+```
+
+A porcentagem de pessoas que gostaria de pesar menos do que realmente pesa é $`r porcent*100`$\%.
+
+**c. Calcule a correlação entre essas duas variáveis. Descreva a relação entre essas variáveis.**
+
+```{r, echo = FALSE}
+corpeso <- cor(PesoAtual,PesoDesejado)
+```
+
+A correlação entre o peso atual e o peso desejado é **`r round(corpeso, 4)`**. Essa correlação é positiva, e, portanto, ambas as variáveis crescem simultaneamente.
+
+**d. Repita a análise anterior separando por sexo. O comportamento por sexo é igual ao comportamento geral estudado acima? Justifique.**
+
+```{r, echo = FALSE}
+par(mfrow=c(1,2))
+##Amostra masculina
+##Gráfico quanto ao peso da amostra masculina
+plot(Mdados$PesoAtual, Mdados$PesoDesejado, xlab = "Peso Atual", yla = "Peso Desejado", main = "Peso atual x desejado (M)", col = "royalblue3", pch = 16, xlim = c(50,90), ylim = c(50,90))
+
+igualdadeM <- line(c(50:90), c(50:90))
+abline(coef(igualdadeM), col = "darkblue", lwd = "2")
+
+Mporcent <- (sum(Mdados$PesoAtual>Mdados$PesoDesejado)/nrow(Mdados))*100
+
+Mcorpeso <- cor(Mdados$PesoAtual, Mdados$PesoDesejado)
+
+##Amostra feminina
+##Gráfico quanto ao peso da amostra feminina
+plot(Fdados$PesoAtual, Fdados$PesoDesejado, xlab = "Peso Atual", yla = "Peso Desejado", main = "Peso atual x desejado (F)", col = "lightpink", pch = 16, xlim = c(50,90), ylim = c(50,90))
+
+igualdadeF <- line(c(50:90), c(50:90))
+abline(coef(igualdadeF), col = "slateblue4", lwd = "2")
+
+Fporcent <- (sum(Fdados$PesoAtual>Fdados$PesoDesejado)/nrow(Fdados))*100
+
+Fcorpeso <- (cor(Fdados$PesoAtual, Fdados$PesoDesejado))
+```
+
+A porcentagem de meninos da amostra que gostariam de pesar menos do que realmente pesam é **`r Mporcent`**\%, e a correlação entre essas variáveis nesse grupo é **`r round(Mcorpeso, 4)`**. Por sua vez, a porcentagem de meninas da amostra que gostariam de pesar menos do que realmente pesam é **`r Fporcent`**\%, maior do que a porcentagem proporção do que a amostra masculina. A correlação entre o peso atual e o peso desejado das meninas é **`r round(Fcorpeso, 4)`**, sendo mais forte do que a correlação da amostra masculina.
+
+Ao analisar os gráficos gerados para cada sexo, podemos observar que a dispersão de indivíduos querendo perder peso ou ganhar massa, no grupo feminino os indivíduos estão mais próximos do seu peso desejado.
+
+
+**CONCLUSÃO SOBRE O EXPERIMENTO**
+
+Com o estudo das variáveis disponibilizadas no questionário respondido pelos alunos, foi possível distinguir as proporções de forma gráfica, com o auxilio do programa RStudio e os comprovando através de estudos estatísticos, como o intuito de concluir com exatidão a dispersão dos dados.  
+
+Observamos que embora tenhamos uma amostra pequena é possíveis realizar uma analise minuciosa com a simulação de possíveis combinações, assim tentando minimizar qualquer exclusão de respostas divergentes a observada. Logo, a estatística é um recurso que íntegra todas as extremidades, de modo a ter conhecimento não de respostas atuais, mas induzindo em afirmações futuras. 
+
+No caso das variáveis estudas e os sexos analisados, podemos categorizar o comportamento humano e o compara-lo com o papel empregado a homens e mulheres ao longo da história. E assim, observar a ascensão ou regresso do mesmo. 
+
+Assim, os estudos estatísticos servem não apenas para a representação de dados em números, mas numa interpretação cuidadosa sobre o objeto de estudo. 
