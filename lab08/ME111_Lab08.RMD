@@ -1,0 +1,70 @@
+---
+title: Distribuições Geométrica e Binomial Negativa
+author: Helton M. Ávila (174471)
+output: html_document
+---
+
+
+```{r}
+dados <- read.csv ("ExperimentosME110.csv", header = TRUE)
+attach (dados)
+
+View(dados)
+```
+
+
+**1. **Considere o Experimento 2. Seja F falha e S sucesso.
+
+**1.1. **Qual o espaço amostral deste experimento?
+
+$\Omega = \left \{ S,FS,FFS,FFFS, ... \right \}$
+
+
+**1.2. **Seja X uma variável aleatória que representa o número de ensaios até que ocorra o primeiro sucesso. Quais os possíveis valores de X? Qual é a probabilidade de sucesso para o Experimento 2? Quais suposições devem ser satisfeitas para os ensaios serem válidos?
+
+$X = \left \{ 1,2,3,4, ... \right \}$
+
+
+
+**1.3. **Considerando o item 3.2, escreva uma equação matemática que represente a probabilidade de X = 1, 2, 3, 4, . . ..
+
+$P\left ( X = k \right ) = \left ( 1-p \right )^{k-1}p$
+
+```{r}
+p <- NULL
+k <- NULL
+
+px <-  function (p,k) {
+x <- (1-p)^((k-1))*p
+    
+print (x)
+}
+```
+
+
+**1.4. **A partir dos dados observados, calcule as mesmas probabilidades do calculada em 3.3. Você acha que as probabilidades obtidas a partir do modelo teórico são próximas às probabilidades observadas? Justifique.
+
+```{r}
+probob <- px (1/36, dados[,2])
+
+plot (dados$nlanc, probob, main = "Número de jogadas no experimento", xlab = "Quantidade de lançamentos", ylab = "Probabilidade", col = "lightblue", pch=16)
+```
+
+Ao analisar o gráfico acima, composto pela quantidade de lançamentos e sua respectiva probabilidade esperada, é possível concluir quão maior a quantidade de lançamentos, menor será a sua probabilidade de ocorrência.
+
+
+**2. **Considere o Experimento 3. Seja F falha e S sucesso.
+**2.1. **Qual o espaço amostral deste experimento?
+
+$\Omega = \left \{ S,FS,FFS,FFFS, ... \right \}$
+
+
+**2.2. **Seja X uma variável aleatória que representa o número de ensaios até que ocorra k sucessos. Quais os possíveis valores de X no Experimento 3? Qual é a probabilidade de sucesso para o Experimento 3? Quais suposições devem ser satisfeitas para os ensaios serem válidos?
+
+$X = \left \{ 4, 5, 6, ... \right \}$
+
+
+**2.3. **Considerando o item 4.2, escreva uma equação que represente a probabilidade para os possíveis valores de X no caso geral e particular do Experimento 3.
+
+
+**2.4. **A partir dos dados observados, você acha que as probabilidades obtidas a partir do modelo teórico definido em 4.3 são próximas às probabilidades observadas? Justifique.

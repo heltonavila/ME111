@@ -1,0 +1,79 @@
+---
+output: pdf_document
+---
+
+```{r}
+dados <- read.csv ("ExperimentosME110.csv", header = TRUE)
+attach (dados)
+```
+
+
+
+```{r}
+k <- NULL
+n <- NULL
+p <- NULL
+
+distbinomial <- function(n,k,p) {
+
+b <- (factorial(n)/(factorial(k)*factorial(n-k)))
+a <- b*(p^k)*((1-p)^(n-k))
+a <- round(a,3)
+print(a)
+}
+```
+
+
+**1. Considerando o Experimento 1:**
+
+**1.1. Qual é o espaço amostral desse experimento?**
+
+O espaço amostral é representado pelo conjunto {1, 2, 3, 4, 5, 6}.
+
+
+**1.2. Qual a probabilidade de sucesso? Existe um modelo teórico de probabilidade chamado modelo Binomial. Para este modelo devemos conhecer o número de ensaios e a probabilidade de sucesso. Como você definiria o modelo Binomial para esse experimento?**
+
+Considerando como sucesso a probabilidade de sair no lançamento um número par, temos: P(Xi=1)=p=0.5
+Para este modelo, é necessário conhecer o número de ensaios (100 ensaios) e a probabilidade de sucesso (p=0.5). Portanto, a notação binomial para o modelo é X ~ Bin(100,0.5).
+
+
+**1.3. Quais suposições devem ser satisfeitas para os ensaios serem válidos?**
+
+Segundo a bibliografia de apoio OpenIntro (3ª edição, página 147), os ensaios devem ser independentes e sua quantidade deve ser fixa. Deve ser possível classificar o resultado de cada ensaio como "sucesso" ou "fracasso", e a probabilidade p de sucesso deve ser a mesma para cada um deles.
+
+
+**2. Seja X uma variável aleatória que representa o número de valores pares em n lançamentos. Assuma que X tem distribuição Binomial definida a partir das características do Experimento 1.**
+
+**2.1. Quais os possíveis valores de X?**
+
+X: {0,1,2,...,100}
+
+
+**2.2. Calcule a probabilidade de X ser igual a {np-5, np - 4, np - 3, np - 2, np - 1, np, np + 1, np + 2, np + 3, np + 4, np + 5} a partir do modelo Binomial, onde n é o número de lançamentos e p a probabilidade de sucesso.**
+
+{np-5, np - 4, np - 3, np - 2, np - 1, np, np + 1, np + 2, np + 3, np + 4, np + 5} = {45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55}
+
+```{r}
+lanc <- 45:55
+dadosnum <- data.frame(lanc)
+dadosnum$prob <- distbinomial(100,c(45:55),0.5)
+dadosnum
+```
+
+**2.3. Calcule as mesmas probabilidades do item 2.2, mas agora a partir dos dados observados.**
+
+```{r}
+tabela <- round(prop.table(table(dados$npares)), 3)
+
+tabela
+```
+
+
+
+**2.4. Considerando os itens 2.2 e 2.3, você acha que as probabilidades observadas justificam o modelo Binomial como apropriado para estes dados? Justifique.**
+
+Em ambas distribuições a maior probabilidade está localizada no lançamento 50. Portanto, é possível concluir que esse lançamento é a moda de ambas distribuições, e que elas possuem uma forma semelhante (todos os valores, tanto à esquerda quanto à direita de 50, apresentam probabilidades inferiores do que esta).
+
+**2.5. Quais suposições devem ser satisfeitas para que os ensaios/lançamentos sejam válidos?**
+
+As tentativas devem ser independentese sua quantidade deve ser fixa. Deve ser possível classificar o resultado de cada tentativa como "sucesso" ou "fracasso", e a probabilidade p de sucesso deve ser a mesma para cada tentativa.
