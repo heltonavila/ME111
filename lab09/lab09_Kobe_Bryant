@@ -1,0 +1,62 @@
+---
+title: "ME111 - Turmas A e B - Exercício 9"
+author: "Helton M. Ávila (174471)"
+output: html_document
+---
+
+```{r, echo = FALSE}
+download.file("http://www.openintro.org/stat/data/kobe.RData", destfile = "kobe.RData")
+load("kobe.RData")
+```
+
+
+### Comparando Kobe Bryant ao Arremessador Independente
+
+No Laboratório 9, você simulou uma sequência de arremessos sob a suposição de arremessos independentes e salvou como *sim_basket*. Utilizando a função *calc_streak*, calcule o comprimento das sequências do vetor simulado *sim_basket*. 
+
+
+**1. Descreva a distribuição das sequências de arremessos. Qual é o comprimento de sequência típico para o arremessador independente simulado com um percentual de arremesso de 45%? Quão longa é a sequência mais longa de cestas em 133 arremessos?**
+
+```{r, echo = FALSE}
+outcomes <- c("H", "M")
+#sample(outcomes, size = 1, replace = TRUE)
+```
+
+```{r, echo = FALSE}
+sim_basket <- sample(outcomes, size = 133, replace = TRUE)
+sim_basket
+```
+
+```{r, echo = FALSE}
+table(sim_basket)
+sim_basket1 <- sample(outcomes, size = 133, replace = TRUE, prob = c(0.45, 0.55))
+```
+
+```{r, echo = FALSE}
+sim_streak <- calc_streak(sim_basket)
+sim_streak
+```
+
+```{r, echo = FALSE}
+barplot(table(sim_streak), col = "lightblue", main = "Sequência típica para o arremessador")
+```
+
+```{r, echo = FALSE}
+max(sim_streak)
+```
+
+A sequência mais longa de cestas em 133 arremessos é `r max(sim_streak)`.
+
+**2. Se você rodasse a simulação do arremessador independente uma segunda vez, como você acha que seria a distribuição de sequências em relação à distribuição da questão acima? Exatamente a mesma? Mais ou menos parecida? Completamente diferente? Explique seu raciocínio.**
+
+Aparentemente semelhante, pois os parâmetros analisados serão os mesmos (como a distribuição se trata de uma distribuição geométrica, é necessário considerar cada ensaio seja independente um do outro, porém com a mesma probabilidade $p$ de ocorrer). Não obstante, a quantidade de ensaios é pequena e quanto mais vezes o experimento for repetido, sua distribuição convergirá para algum valor.
+
+
+**3. Como a distribuição dos comprimentos de sequência de Kobe Bryant (Laboratório 9 - Exercício 2) se comparam à distribuição de comprimentos de sequência do arremessador simulado? Utilizando essa comparação, você tem evidência de que o modelo das mãos quentes se ajusta aos padrões de arremessos de Kobe? Explique.**
+
+```{r, echo = FALSE}
+kobe_streak <- calc_streak(kobe$basket)
+barplot(table(kobe_streak), col = "orange", main = "Sequência típica de lançamentos para Kobe Bryant")
+```
+
+
