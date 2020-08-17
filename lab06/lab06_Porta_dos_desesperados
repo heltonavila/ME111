@@ -1,0 +1,110 @@
+# Exercício 6
+
+## Porta dos Desesperados
+
+Imagine-se em um programa de auditório em que 3 portas são colocadas à sua frente.  Atrás de uma delas há um bom prêmio e atrás das outras duas não há nada.
+O apresentador pede que você escolha uma das 3 portas. Após a sua escolha, ele mostra uma porta que está vazia pra você. Então ele pergunta se você quer trocar a sua porta pela outra fechada que restou. Qual a melhor estratégia? Trocar ou ficar com a primeira porta? Você trocaria?
+
+
+### Experimento feito em classe
+
+Antes de começar a análise, instale o pacote "printr". 
+
+Os dados da Turma A foram salvo num arquivo chamado "dadosME111A.csv" e os dados da Turma B foram salvos em "dadosME111B.csv". Leia o arquivo referente à sua turma e comente a linha que lê o arquivo da outra turma.
+
+```{r, echo=TRUE}
+## dados <- read.csv("dadosME111A.csv", header = T) ## Dados Turma A
+dados <- read.csv("dadosME111B.csv", header = T) ## Dados Turma B
+```
+
+
+A seguir apresentamos os resultados obtidos em classe:
+```{r, echo=FALSE}
+##library(printr)
+tab.dados <- table(dados$Trocou, dados$Ganhou, dnn = c("Trocou?", "Ganhou?"))
+tab.dados
+resultado <- round(prop.table(tab.dados, margin=1), 2)
+```
+
+Entre os alunos que escolheram a estratégia de trocar de porta, temos que `r resultado[2, 2]*100`% saíram vencedores. Já entre os alunos que escolheram manter a primeira escolha até o final, temos que `r resultado[1, 2]*100`% venceram.
+
+### Simulação da "Porta dos Desesperados"
+
+No entanto, o experimento foi repetido poucas vezes!!!
+
+Lembre-se da **"Lei dos Grandes Números"**: o ideal seria repetirmos $n$ vezes e observarmos a proporção de vencedores para uma ou outra estratégia ao final de $n$ repetições, em que $n$ é um número suficientemente grande. 
+
+Como temos tempo e bombons finitos, iremos programar uma simulação da "Porta dos Desesperados".
+
+O código a seguir apresenta a simulação de 1000 programas da "Porta dos Desesperados". No chunk existe umas guias para programação que vocês devem retirar o '#' e completar o código. No entanto, mas você pode apagar tudo e fazer do jeito que achar melhor, desde que responda o parágrafo a seguir corretamente, usando seu código.
+
+
+```{r, echo=TRUE, eval=TRUE}
+n <- 10000
+resultadoQuandoNaoTroca <- c()
+resultadoQuandoTroca <- c()
+portas <- c("A","B","C")
+
+for (i in 1:n) {
+  ## número da porta com o prêmio, escolhida ao acaso pela produção do programa
+portapremio <- sample(portas, 1)
+  
+  ## número da porta escolhida ao acaso pelo participante
+portaescolhida <- sample(portas, 1)
+
+  ## vetor cujos elementos representam as portas vazias (sem premio e sem ter sido escolhida pelo jogador)
+portaslivres <- portas [portas != portaescolhida & portas != portapremio]
+
+  ## porta mostrada pelo apresentador, escolhida ao acaso entre as portas vazias disponíveis.
+ApresentadorMostra <- sample(portaslivres, 1, replace = TRUE)
+  
+  ## indica a porta escolhida após a troca
+trocouPorta <- portas[portas != ApresentadorMostra & portas != portaescolhida]
+  
+resultadoQuandoNaoTroca[i] <- ifelse(portaescolhida == portapremio, "ganhou", "perdeu")
+resultadoQuandoTroca[i] <- ifelse(trocouPorta == portapremio, "ganhou", "perdeu")
+  }
+
+proporcaoManteveGanhou <- mean(resultadoQuandoNaoTroca == "ganhou")
+proporcaoTrocouGanhou <- mean(resultadoQuandoTroca == "ganhou")
+```
+
+Se o programa "Porta dos Desesperados" for repetido `r n` vezes e todas as vezes os participantes escolherem a estratégia de nunca trocar a porta inicialmente escolhida, teremos `r 100*proporcaoManteveGanhou`\% dos participantes premiados.
+
+Se o programa "Porta dos Desesperados" for repetido `r n` vezes e todas as vezes os participantes escolherem a estratégia de sempre trocar a porta inicialmente escolhida, teremos `r 100*proporcaoTrocouGanhou`\% dos participantes premiados.
+
+Portanto a estratégia de trocar de porta é a que produzirá maior número de vencedores, segundo a simulação.
+
+
+### Comparando as duas estratégias através do Teorema de Bayes
+
+Para avaliar qual a melhor estratégia, temos também a opção de fazer os cálculos através do Teorema de Bayes.
+
+Suponha o seguinte cenário (sem perda de generalidade): o jogador escolhe a porta número 1. Considere os eventos:
+
+* $A_1$: prêmio está na porta 1.
+* $A_2$: prêmio está na porta 2.
+* $A_3$: prêmio está na porta 3.
+* $O$: apresentador abre a porta 3.
+
+Temos que:
+
+* $P(A_1)=P(A_2)=P(A_3)=1/3$.
+
+* $P(O\mid A_1)=1/2$.
+
+* $P(O\mid A_2)=1$.
+
+* $P(O\mid A_3)=0$.
+
+A probabilidade do prêmio estar na porta 1 (porta escolhida pelo jogador), dado que o apresentador mostra a porta 3:
+
+$P(A_1 \mid O)=1/3$
+
+
+A probabilidade do prêmio estar na porta 2 (ou seja, se o jogador trocasse do porta, venceria), dado que o apresentador mostra a porta 3:
+
+$P(A_2 \mid O)=2/3$
+
+
+Portanto, se o jogador escolhe a porta 1 e não troca, a probabilidade de vencer o prêmio é 1/3. Se o jogador escolhe a porta 1 e troca, a probabilidade de vencer o prêmio é 2/3.
