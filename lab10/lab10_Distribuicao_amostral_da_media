@@ -1,0 +1,101 @@
+---
+title: "ME111 - Turmas A e B - Exercício 10"
+author: "Helton M. Ávila (174471)"
+output: html_document
+---
+
+### Distribuição Amostral da Média
+
+Baseado no que você aprendeu no Laboratório 10, agora é sua vez de responder as questões a seguir. 
+
+Primeiramente, vamos baixar novamente o arquivo de dados e criar duas váriaveis chamadas *area* e *price* que representam, respectivamente, a área habitável da casa acima do nível do solo em pés quadrados (*Gr.Liv.Area*) e o preço da venda (*SalePrice*).
+
+```{r}
+download.file("http://www.openintro.org/stat/data/ames.RData", destfile = "ames.RData")
+load("ames.RData")
+
+area <- ames$Gr.Liv.Area
+price <- ames$SalePrice
+```
+
+No laboratório 10, nós nos ocupamos em estimar a média da área habitável nas casas do município de Ames. Agora você tentará estimar a média dos preços das casas.
+
+
+
+**1. Retire uma amostra aleatória de 50 elementos da variável *price* (preço). Com essa amostra, qual é sua melhor estimativa pontual para a média populacional?**
+
+```{r}
+set.seed(123456)
+```
+
+```{r}
+par(mfrow = c(1,1))
+price1 <- sample(price, 50)
+hist (price1, col = "lightgrey", main = "Histograma do preço de imóveis (50)", ylab = "Frequência", xlab = "Preço")
+
+mean(price)
+summary(price1)
+```
+
+A média amostral é um bom estimador para a população.
+
+**2. Já que você tem acesso à população, simule a distribuição amostral de $\bar{x}_{price}$ retirando 5000 amostras de 50 elementos da população e calculando 5000 médias amostrais. Armazene essas médias em um vetor com o nome *sample\_means50*. Crie um gráfico com os resultados, e então descreva a forma dessa distribuição amostral. Baseado nessa distribuição amostral, qual seria seu palpite para a média dos preços das casas na população? Por fim, calcule e informe a média populacional.**
+
+```{r}
+sample_means50 <- rep(0, 5000)
+for(i in 1:5000){
+  samp <- sample(price, 50)
+  sample_means50[i] <- mean(samp)
+}
+```
+
+```{r}
+hist(sample_means50, col="royalblue3", main = "Histograma do preço de imóveis (n=50)", xlab = "Média amostral dos preços", ylab = "Frequência")
+abline(v=mean(price), col="red", lwd=3)
+```
+
+```{r}
+mean(sample_means50)
+```
+
+ A forma da distribuição encontrada é assimétrica à direita, e meu palpite seria de que a média dos preços das casas na população se encontra próximo ao valor 180000. Por fim, a média do preço de imóveis da população calculada é **`r mean(sample_means50)`**.
+
+
+**3. Mude o tamanho da sua amostra de 50 para 150, e então calcule a distribuição amostral utilizando o mesmo método descrito acima, e guarde as médias em um novo vetor com o nome *sample\_means150*. Descreva a forma dessa distribuição amostral e compare-a com a distribuição amostral para a amostra de 50 elementos. Com base nessa distribuição amostral, qual seria seu palpite sobre a média dos preços de vendas de casas no município de Ames?**
+
+```{r}
+sample_means150 <- rep(0, 5000)
+for(i in 1:5000){
+  samp <- sample(price, 50)
+  sample_means150[i] <- mean(samp)
+}
+```
+
+```{r}
+hist(sample_means150, col="lightgreen", main = "Histograma do preço de imóveis (n=150)", xlab = "Média amostral dos preços", ylab = "Frequência")
+abline(v=mean(price), col="red", lwd=3)
+```
+
+```{r}
+mean(sample_means150)
+```
+
+O preço de venda encontrado na variável *sample_means50*, esta com 50 casos, é **`r mean(sample_means50)` **, enquanto a média da variável *sample_means150*, agora composta por 150 casos, é **`r mean(sample_means150)` **. Assim, é possível concluir que a estimativa mais precisa quanto à distribuição populacional seria a média da amostra contendo 150 casos - quanto maior a amostra, mais próxima a resposta será em relação à população.
+
+Em outras palavras, quanto mais amostras forem colhidas, mais precisa será a estimativa da média populacional.
+
+**4. Das distribuições amostrais calculadas nos exercícios 2 e 3, qual tem menor dispersão? Se estamos interessados em estimativas que estão mais próximas do valor verdadeiro, preferiríamos uma distribuição com uma dispersão pequena ou grande?**
+
+```{r}
+par(mfrow=c(1,2))
+
+hist(sample_means50, col="royalblue3", main = "Preço de imóveis (n=50)", xlab = "Média amostral dos preços", ylab = "Frequência")
+abline(v=mean(price), col="red", lwd=3)
+
+hist(sample_means150, col="lightgreen", main = "Preço de imóveis (n=150)", xlab = "Média amostral dos preços", ylab = "Frequência")
+abline(v=mean(price), col="red", lwd=3)
+```
+
+Das distribuições calculadas nos exercícios anteriores a que apresenta menor dispersão é a do exercício 3, composta por 150 casos. Isso ocorre porque quanto mais amostras forem colhidas mais precisa será a estimativa da média populacional. 
+
+Concluindo, se estamos interessados em estimativas que estão mais próximas do valor verdadeiro, seria preferível trabalhar com uma distribuição que apresenta dispersão pequena.
